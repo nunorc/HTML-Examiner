@@ -1,0 +1,126 @@
+%{
+=head1 NAME
+
+HTML::Examiner::Parser - this module implements the parser
+
+=head1 VERSION
+
+Version 0.01_1
+
+=cut
+
+our $VERSION = '0.01_1';
+
+=head1 DESCRIPTION
+
+XXX
+
+=head1 FUNCTIONS
+
+=cut
+
+=head2 new
+
+Create a new parser.
+
+=cut
+%}
+
+%%
+
+function : statement { +{function=>$_[1]} }
+        ;
+
+statement : pattern ARROW action { +{pattern=>$_[1],action=>$_[3]} }
+          ;
+
+
+pattern : target verb element { +{target=>$_[1],verb=>$_[2],element=>$_[3]} }
+        | target { +{target=>$_[1]} }
+        ;
+
+target : TAG OPEN tagname CLOSE { +{'tag'=>$_[3]} }
+       | TAG OPEN tagname CLOSE DOT CONTENT { +{tag=>$_[3],content=>$_[6]} }
+       | TAG OPEN tagname CLOSE DOT PROP OPEN NAME CLOSE { +{tag=>$_[3],prop=>$_[8]} }
+       ;
+
+tagname: NAME { +{'name'=>$_[1]} }
+       | RE { +{'re'=>$_[1]} }
+       ;
+
+verb : VERB { +{verb=>$_[1]} }
+     ;
+
+element : PROP OPEN NAME CLOSE { +{prop=>$_[3]} }
+        | RE { +{re=>$_[1]} }
+        ;
+
+action : TYPE STR { +{type=>$_[1],msg=>$_[2]} }
+       ;
+
+%%
+
+=head2 lex
+
+Function used to tokenize source code.
+
+=cut
+
+sub lex {
+	my $self = shift;
+#print "SOURCE ".$self->{'code'}."\n";
+
+    for ($self->{'code'}) {
+        s!^\s+!!;
+        ($_ eq '')    and return ('',undef);
+
+        s!^(tag)!!i    and return('TAG',$1);
+        s!^(prop)!!i    and return('PROP',$1);
+        s!^(error)!!i    and return('TYPE',$1);
+        s!^(content)!!i    and return('CONTENT',$1);
+        s!^(contains|misses|matches|mismatches)!!i    and return('VERB',$1);
+        s!^(\=\>)!!    and return('ARROW',$1);
+        s!^(\()!!    and return('OPEN',$1);
+        s!^(\))!!    and return('CLOSE',$1);
+        s!^(\.)!!    and return('DOT',$1);
+        s!^(\w+)!!    and return('NAME',$1);
+        #s!^(sub)!!    and return('SUB',$1);
+        #s!^\{(.*)\}!!s    and print "|$1|\n" and return('CODE',$1);
+        #s!^\{([^{}]*(\{[^{}]*\}[^{}]*)*)\}!!s and return('CODE',$1);
+
+        s!^\"([^\"]+)\"!!    and return('STR',$1);
+        s!^/([^/]*)/!!    and return('RE',$1);
+    }
+}
+
+=head2 yyerror
+
+Function used to report errors.
+
+=cut
+
+sub yyerror {
+  if ($_[0]->YYCurtok) {
+      printf STDERR ('Error: a "%s" (%s) was found where %s was expected'."\n",
+         $_[0]->YYCurtok, $_[0]->YYCurval, $_[0]->YYExpect)
+  }
+  else { print  STDERR "Expecting one of ",join(", ",$_[0]->YYExpect),"\n";
+  }
+}
+
+=head2 init_lex
+
+Function used to initialize everything we need.
+
+=cut
+
+sub init_lex {
+    my $self = shift;
+    $self->{'code'} = shift;
+
+    local $/;
+    undef $/;
+    #$File = <>
+}
+
+# vim: set filetype=perl
