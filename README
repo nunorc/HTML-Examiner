@@ -1,8 +1,6 @@
-HTML-Examiner
-
-HTML::Examiner is a module to run rule based verifications
-on HTML. This is not a module to execute W3C validations. The rules
-are described using a Domain Specific Language.
+HTML::Examiner is a module to run rule based verifications on HTML. This 
+is not a module to execute W3C validations. The rules are described using 
+a Domain Specific Language.
 
 INSTALLATION
 
