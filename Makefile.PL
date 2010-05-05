@@ -26,6 +26,7 @@ WriteMakefile(
         'Template' => 0,
         'XML::DT' => 0,
         'Parse::Yapp' => 0,
+        'Parse::Yapp::Driver' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'HTML-Examiner-*' },
