@@ -1,5 +1,8 @@
 Revision history for HTML-Examiner
 
+0.01_2 Thu May  6 22:09:11 WEST 2010
+       Fix Makefile.PL dependencias.
+
 0.01_1 Mon May  3 22:27:21 WEST 2010
        First beta version.
 
